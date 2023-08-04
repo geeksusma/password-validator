@@ -3,6 +3,7 @@ package es.geeksusma.passwordvalidator.domain;
 class BasicPassword implements Password {
 
     private static final int MINIMUM_CHARS = 8;
+    private static final char SYMBOL = '_';
     private final String password;
 
     private BasicPassword(String password) {
@@ -15,59 +16,30 @@ class BasicPassword implements Password {
 
     @Override
     public boolean check() {
-        return isNotEmpty() && hasMinimumOrMoreChars() && hasACapitalLetter() && hasALowerCase() && hasANumber() && hasASymbol('_');
+        return isNotEmpty() && hasMinimumOrMoreChars() && fulfillConditions();
     }
 
-    private boolean hasASymbol(char symbol) {
-        return containsASymbol(password.toCharArray(), symbol);
-    }
-
-    private boolean containsASymbol(char[] chars, char symbol) {
+    private boolean fulfillConditions() {
+        char[] chars = password.toCharArray();
+        boolean hasANumber = false;
+        boolean hasACapital = false;
+        boolean hasALowerCase = false;
+        boolean hasTheSymbol = false;
         for (char aChar : chars) {
-            if (aChar == symbol) {
-                return true;
+            if (!hasANumber) {
+                hasANumber = Character.isDigit(aChar);
+            }
+            if (!hasACapital) {
+                hasACapital = Character.isUpperCase(aChar);
+            }
+            if (!hasALowerCase) {
+                hasALowerCase = Character.isLowerCase(aChar);
+            }
+            if (!hasTheSymbol) {
+                hasTheSymbol = aChar == SYMBOL;
             }
         }
-        return false;
-    }
-
-    private boolean hasANumber() {
-        return containsANumber(password.toCharArray());
-    }
-
-    private boolean containsANumber(char[] chars) {
-        for (char aChar : chars) {
-            if (Character.isDigit(aChar)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean hasALowerCase() {
-        return containsALowerCase(password.toCharArray());
-    }
-
-    private static boolean containsALowerCase(char[] chars) {
-        for (char aChar : chars) {
-            if (Character.isLowerCase(aChar)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean hasACapitalLetter() {
-        return containsAnUpperCase(password.toCharArray());
-    }
-
-    private static boolean containsAnUpperCase(char[] chars) {
-        for (char aChar : chars) {
-            if (Character.isUpperCase(aChar)) {
-                return true;
-            }
-        }
-        return false;
+        return hasANumber && hasACapital && hasALowerCase && hasTheSymbol;
     }
 
     private boolean isNotEmpty() {
